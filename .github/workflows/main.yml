@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        required: true
+        default: '3.12'
 
 jobs:
   lint:
@@ -18,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ github.event.inputs.python-version }}
 
       - name: Install dependencies
         run: |
@@ -38,7 +43,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ github.event.inputs.python-version }}
 
       - name: Install dependencies
         run: |
@@ -59,7 +64,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ github.event.inputs.python-version }}
 
       - name: Install build tools
         run: |
@@ -69,11 +74,18 @@ jobs:
       - name: Build Python package
         run: python -m build
 
+      - name: Copy hello text file into artifact folder
+        run: |
+          mkdir -p dist
+          cp helloworld.txt dist/helloworld.txt
+
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@v4
         with:
           name: python-package
-          path: dist/
+          path: |
+            dist/
+            helloworld.txt
 
   publish:
     name: Publish package
@@ -86,7 +98,9 @@ jobs:
           name: python-package
           path: dist/
 
-      - name: Publish package artifact
-        run: echo "Publishing built package from dist/"
-
+      - name: Show downloadable files
+        run: |
+          ls -R dist
+          echo "---"
+          cat dist/helloworld.txt
 
