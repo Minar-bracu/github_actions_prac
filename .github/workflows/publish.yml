@@ -1,0 +1,20 @@
+name: Publish package
+
+on:
+  workflow_call:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+      - name: Show downloadable files
+        run: |
+          ls -R dist
+          echo "---"
+          cat dist/helloworld.txt
